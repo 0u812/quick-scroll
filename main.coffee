@@ -2,24 +2,28 @@
 module.exports = QuickScroll =
 
    activate: ->
-      @sensitivity = 120
-      @native = atom.config.get 'editor.scrollSensitivity'
-
       atom.workspace.observeTextEditors (editor) ->
          process.nextTick () ->
             editor.element.addEventListener 'wheel', quickScroll
 
       quickScroll = (event) =>
          return unless event.altKey
-         atom.config.set 'editor.scrollSensitivity', atom.config.get 'quick-scroll.sensitivity'
+         atom.config.set 'editor.scrollSensitivity', atom.config.get 'quick-scroll.quickSensitivity'
          event.target.component.onMouseWheel(event)
-         atom.config.set 'editor.scrollSensitivity', @native
+         atom.config.set 'editor.scrollSensitivity', atom.config.get 'quick-scroll.regularSensitivity'
+
+      atom.config.onDidChange 'quick-scroll.regularSensitivity', ({newValue}) ->
+         atom.config.set 'editor.scrollSensitivity', newValue
 
    deactivate: ->
       return null
 
    config:
-      'sensitivity':
+      'quickSensitivity':
          type: 'number'
          default: 120
          description: 'The increase in scrolling sensitivity while alt key is held'
+      'regularSensitivity':
+         type: 'number'
+         default: 40
+         description: 'Your regular scrolling sensitivity'
