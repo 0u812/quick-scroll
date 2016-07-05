@@ -1,7 +1,7 @@
 {
   "name": "quick-scroll",
   "main": "./main",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "Scroll faster with the alt key",
   "keywords": [
     "scrolling",
