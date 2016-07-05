@@ -1,0 +1,18 @@
+{
+  "name": "quick-scroll",
+  "main": "./main",
+  "version": "0.0.0",
+  "description": "Scroll faster with the alt key",
+  "keywords": [
+    "scrolling",
+    "faster scroll"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/refkotay/quick-scroll.git"
+  },
+  "license": "MIT",
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  }
+}
