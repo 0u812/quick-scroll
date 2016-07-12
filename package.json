@@ -1,8 +1,8 @@
 {
   "name": "quick-scroll",
-  "main": "./main",
+  "main": "./quick-scroll",
   "version": "1.0.0",
-  "description": "Scroll faster with the alt key",
+  "description": "Scroll faster throughout Atom",
   "keywords": [
     "scrolling",
     "faster scroll"

@@ -1,18 +1,26 @@
 # quick-scroll
 
-Scroll faster with the alt key, configurable speed.
+Scroll faster across Atom with the modifiers of your choice at two configurable speeds.
+Also manages regular scroll sensitivity, which defaults to 40.
 
-##### Installation
+Modifiers are configurable in settings. By default,
+use ctrl or shift for quick-scroll, or use both together for 'overloaded' scrolling.
+Finally, Use alt to scroll horizontally and shift-alt to zoom the font.
 
-You can search for and install this package in Atom, or using command line:
+Mac's cmd can be chosen as a modifier, but compatability is currently unknown. Any PR's or suggestions on the topic of mac defaults or cmd functionality would be appreciated.
+
+## Installation
+
+You can search for 'quick-scroll' by navigating to  `settings > install` and install from within Atom, or you can use the following command in the terminal:
 
 `apm install quick-scroll`
 
-##### Contributions
+## Contributions
 
 Issues, suggestions, and contributions are welcome.
+You can submit a PR or just post a helpful snippet in the issues section.
 
-##### License
+## MIT License
 
 <sub>
 Copyright (c) 2016 refkotay</br>
