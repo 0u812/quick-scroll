@@ -78,12 +78,12 @@ module.exports = QuickScroll =
    onMouseWheel: (event) ->
 
       return if event.simulated
-      event.preventDefault()
 
       {wheelDelta, target} = event
       isEditor = (target.localName == "atom-text-editor")
 
       if isEditor == false
+         event.preventDefault()
          if event[@horizontalModifier]
             while !@canScrollLeft(target)
                target = target.parentNode
@@ -133,12 +133,16 @@ module.exports = QuickScroll =
 
          if event[@horizontalModifier]
             previousScrollLeft = component.presenter.getScrollLeft()
-            component.presenter.setScrollLeft(previousScrollLeft - delta)
+            updatedScrollLeft = previousScrollLeft - delta
+            event.preventDefault() if component.presenter.canScrollLeftTo(updatedScrollLeft)
+            component.presenter.setScrollLeft(updatedScrollLeft)
             return
          else
             component.presenter.setMouseWheelScreenRow(component.screenRowForNode(target))
             previousScrollTop = component.presenter.getScrollTop()
-            component.presenter.setScrollTop(previousScrollTop - delta)
+            updatedScrollTop = previousScrollTop - delta
+            event.preventDefault() if component.presenter.canScrollTopTo(updatedScrollTop)
+            component.presenter.setScrollTop(updatedScrollTop)
             return
       else if event[@horizontalModifier]
          target.dispatchEvent new WheelEvent("wheel", {wheelDeltaX: delta, simulated: true})
