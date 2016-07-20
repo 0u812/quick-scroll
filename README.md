@@ -1,13 +1,16 @@
 # quick-scroll
 
-Scroll faster across Atom with the modifiers of your choice at two configurable speeds.
-Also manages regular scroll sensitivity, which defaults to 40.
+Scroll faster across Atom with 'quick-scroll regions' or with the modifiers of your choice.
 
-Modifiers are configurable in settings. By default,
-use ctrl or shift for quick-scroll, or use both together for 'overloaded' scrolling.
-Finally, Use alt to scroll horizontally and shift-alt to zoom the font.
+- quick-scroll regions default to 12% of the right side of an element.
+- use ctrl or shift for quick-scroll
+- use both together for 'overloaded' scrolling
+- use shift and alt to change the font size in an editor
+- use alt to scroll horizontally
 
-Mac's cmd can be chosen as a modifier, but compatability is currently unknown. Any PR's or suggestions on the topic of mac defaults or cmd functionality would be appreciated.
+Mac's cmd can be possibly chosen as a modifier, but compatibility is currently unknown. Any PR's or suggestions on the topic of mac defaults or cmd functionality would be appreciated.
+
+Note: This package also manages regular scroll sensitivity, which defaults to 40.
 
 ## Installation
 
