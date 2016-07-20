@@ -1,7 +1,7 @@
 {
   "name": "quick-scroll",
   "main": "./quick-scroll",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Scroll faster throughout Atom",
   "keywords": [
     "scrolling",
