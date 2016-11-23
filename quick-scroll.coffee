@@ -23,9 +23,8 @@ module.exports = QuickScroll =
          atom.workspace.observeTextEditors (editor) =>
             component = editor.getElement().component
             component.domNode.removeEventListener "mousewheel", component.onMouseWheel
-            @componentOnMouseWheelCache ?= component.onMouseWheel
+            @components.push({component, onMouseWheel: component.onMouseWheel})
             component.onMouseWheel = () -> return null
-            @components.push(component)
 
          atom.config.observe "quick-scroll.regularSensitivity", (value) =>
             @regularSensitivity = value
@@ -60,6 +59,7 @@ module.exports = QuickScroll =
 
       )
 
+
    canScrollTop: (target) ->
       return true if target.scrollTop != 0
       target.scrollTop++
@@ -77,10 +77,18 @@ module.exports = QuickScroll =
 
    onMouseWheel: (event) ->
 
-      return if event.simulated
-
       {wheelDelta, target} = event
-      isEditor = (target.localName == "atom-text-editor")
+
+      isEditor = false
+      parent = target
+      while parent
+         if parent.localName == "atom-text-editor"
+            isEditor = true
+            target = parent
+            break
+         else
+            parent = parent.parentNode
+
 
       if isEditor == false
          event.preventDefault()
@@ -144,10 +152,13 @@ module.exports = QuickScroll =
             event.preventDefault() if component.presenter.canScrollTopTo(updatedScrollTop)
             component.presenter.setScrollTop(updatedScrollTop)
             return
+
       else if event[@horizontalModifier]
-         target.dispatchEvent new WheelEvent("wheel", {wheelDeltaX: delta, simulated: true})
+         target.scrollLeft -= delta
+
       else
-         target.dispatchEvent new WheelEvent("wheel", {wheelDeltaY: delta, simulated: true})
+         target.scrollTop -= delta
+
 
    relabelAtomMenu: (searchTerms, newLabel) ->
       menu = atom.menu.template
@@ -185,10 +196,11 @@ module.exports = QuickScroll =
          QuickScroll = null
 
    revertComponents: ->
-      for component in @components
-         if component
-            component.onMouseWheel = @componentOnMouseWheelCache
-            component.domNode.addEventListener "mousewheel", component.onMouseWheel
+      for pair in @components
+         component = pair.component
+         if !component then continue
+         component.onMouseWheel = pair.onMouseWheel
+         component.domNode.addEventListener "mousewheel", component.onMouseWheel
 
 
    menu: [
