@@ -7,12 +7,15 @@ module.exports = QuickScroll =
       @subs = []
       @components = []
       @active = true
+      
+      @usedCtrlScrolling = atom.config.get('editor.zoomFontWhenCtrlScrolling')
+      atom.config.set('editor.zoomFontWhenCtrlScrolling', false)
 
       @onMouseWheel = @onMouseWheel.bind(@)
 
       window.addEventListener "wheel", @onMouseWheel
 
-      if !@dispatching
+      if !@toggling
          process.nextTick () =>
             @toggleCommandSub = atom.commands.add "atom-workspace", "quick-scroll:toggle": => @toggle()
             @menuSub = atom.menu.add @menu
@@ -23,8 +26,7 @@ module.exports = QuickScroll =
          atom.workspace.observeTextEditors (editor) =>
             component = editor.getElement().component
             component.domNode.removeEventListener "mousewheel", component.onMouseWheel
-            @components.push({component, onMouseWheel: component.onMouseWheel})
-            component.onMouseWheel = () -> return null
+            @components.push(component)
 
          atom.config.observe "quick-scroll.regularSensitivity", (value) =>
             @regularSensitivity = value
@@ -79,18 +81,11 @@ module.exports = QuickScroll =
 
       {wheelDelta, target} = event
 
-      isEditor = false
-      parent = target
-      while parent
-         if parent.localName == "atom-text-editor"
-            isEditor = true
-            target = parent
-            break
-         else
-            parent = parent.parentNode
-
-
-      if isEditor == false
+      isEditor = target.closest('atom-text-editor')
+      
+      if isEditor
+        target = isEditor
+      else
          event.preventDefault()
          if event[@horizontalModifier]
             while !@canScrollLeft(target)
@@ -129,14 +124,14 @@ module.exports = QuickScroll =
 
       delta = Math.round(wheelDelta * scrollSensitivity / 100)
 
-      if isEditor == true
+      if isEditor
          component = target.component
 
          if (@zoomModifier.every((mod) -> event[mod]))
             if delta > 0
-               component.workspace.increaseFontSize()
+               atom.workspace.increaseFontSize()
             else if delta < 0
-               component.workspace.decreaseFontSize()
+               atom.workspace.decreaseFontSize()
             return
 
          if event[@horizontalModifier]
@@ -160,46 +155,31 @@ module.exports = QuickScroll =
          target.scrollTop -= delta
 
 
-   relabelAtomMenu: (searchTerms, newLabel) ->
-      menu = atom.menu.template
-      for searchTerm in searchTerms
-         if menu
-            for obj in menu
-               if typeof obj.label == 'string'
-                  if obj.label.replace(/&/g, "") == searchTerm
-                     menu = obj.submenu
-                     break
-      if obj.label == searchTerms.pop()
-         obj.label = newLabel
-         atom.menu.update()
-         return obj
-
    toggle: ->
-      @dispatching = true
+      @toggling = true
       if @active
          @deactivate()
-         @relabelAtomMenu(["Packages", "QuickScroll", "Deactivate"], "Activate")
-         @dispatching = false
+         @toggling = false
       else
          @activate()
-         @relabelAtomMenu(["Packages", "QuickScroll", "Activate"], "Deactivate")
-         @dispatching = false
+         @toggling = false
+
 
    deactivate: () ->
       @active = false
       sub.dispose() for sub in @subs
       window.removeEventListener "wheel", @onMouseWheel
+      atom.config.set('editor.zoomFontWhenCtrlScrolling', @usedCtrlScrolling)
       @revertComponents()
-      if !@dispatching
+      if !@toggling
          @menuSub.dispose()
          @toggleCommandSub.dispose()
          QuickScroll = null
 
+
    revertComponents: ->
-      for pair in @components
-         component = pair.component
+      for component in @components
          if !component then continue
-         component.onMouseWheel = pair.onMouseWheel
          component.domNode.addEventListener "mousewheel", component.onMouseWheel
 
 
@@ -208,11 +188,12 @@ module.exports = QuickScroll =
       "submenu": [
          "label": "QuickScroll"
          "submenu": [
-            "label": "Deactivate"
+            "label": "Toggle"
             "command": "quick-scroll:toggle"
          ]
       ]
    ]
+
 
    config:
       "regularSensitivity":
