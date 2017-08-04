@@ -7,7 +7,7 @@ module.exports = QuickScroll =
       @subs = []
       @components = []
       @active = true
-      
+
       @usedCtrlScrolling = atom.config.get('editor.zoomFontWhenCtrlScrolling')
       atom.config.set('editor.zoomFontWhenCtrlScrolling', false)
 
@@ -24,8 +24,8 @@ module.exports = QuickScroll =
       @subs.push(
 
          atom.workspace.observeTextEditors (editor) =>
-            component = editor.getElement().component
-            component.domNode.removeEventListener "mousewheel", component.onMouseWheel
+            component = atom.views.getView(editor)
+            component.removeEventListener "mousewheel", component.onMouseWheel
             @components.push(component)
 
          atom.config.observe "quick-scroll.regularSensitivity", (value) =>
@@ -82,7 +82,7 @@ module.exports = QuickScroll =
       {wheelDelta, target} = event
 
       isEditor = target.closest('atom-text-editor')
-      
+
       if isEditor
         target = isEditor
       else
@@ -135,17 +135,14 @@ module.exports = QuickScroll =
             return
 
          if event[@horizontalModifier]
-            previousScrollLeft = component.presenter.getScrollLeft()
+            previousScrollLeft = component.getScrollLeft()
             updatedScrollLeft = previousScrollLeft - delta
-            event.preventDefault() if component.presenter.canScrollLeftTo(updatedScrollLeft)
-            component.presenter.setScrollLeft(updatedScrollLeft)
+            component.setScrollLeft(updatedScrollLeft)
             return
          else
-            component.presenter.setMouseWheelScreenRow(component.screenRowForNode(target))
-            previousScrollTop = component.presenter.getScrollTop()
+            previousScrollTop = component.getScrollTop()
             updatedScrollTop = previousScrollTop - delta
-            event.preventDefault() if component.presenter.canScrollTopTo(updatedScrollTop)
-            component.presenter.setScrollTop(updatedScrollTop)
+            component.setScrollTop(updatedScrollTop)
             return
 
       else if event[@horizontalModifier]
@@ -180,7 +177,7 @@ module.exports = QuickScroll =
    revertComponents: ->
       for component in @components
          if !component then continue
-         component.domNode.addEventListener "mousewheel", component.onMouseWheel
+         component.addEventListener "mousewheel", component.onMouseWheel
 
 
    menu: [
