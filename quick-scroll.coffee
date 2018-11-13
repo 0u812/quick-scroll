@@ -7,7 +7,7 @@ module.exports = QuickScroll =
       @subs = []
       @components = []
       @active = true
-      
+
       @usedCtrlScrolling = atom.config.get('editor.zoomFontWhenCtrlScrolling')
       atom.config.set('editor.zoomFontWhenCtrlScrolling', false)
 
@@ -24,9 +24,9 @@ module.exports = QuickScroll =
       @subs.push(
 
          atom.workspace.observeTextEditors (editor) =>
-            component = editor.getElement().component
-            component.domNode.removeEventListener "mousewheel", component.onMouseWheel
-            @components.push(component)
+            view = atom.views.getView(editor)
+            view.removeEventListener "mousewheel", view.onMouseWheel
+            @components.push(view)
 
          atom.config.observe "quick-scroll.regularSensitivity", (value) =>
             @regularSensitivity = value
@@ -82,7 +82,7 @@ module.exports = QuickScroll =
       {wheelDelta, target} = event
 
       isEditor = target.closest('atom-text-editor')
-      
+
       if isEditor
         target = isEditor
       else
@@ -125,8 +125,6 @@ module.exports = QuickScroll =
       delta = Math.round(wheelDelta * scrollSensitivity / 100)
 
       if isEditor
-         component = target.component
-
          if (@zoomModifier.every((mod) -> event[mod]))
             if delta > 0
                atom.workspace.increaseFontSize()
@@ -135,17 +133,18 @@ module.exports = QuickScroll =
             return
 
          if event[@horizontalModifier]
-            previousScrollLeft = component.presenter.getScrollLeft()
+            previousScrollLeft = target.getScrollLeftColumn()
             updatedScrollLeft = previousScrollLeft - delta
-            event.preventDefault() if component.presenter.canScrollLeftTo(updatedScrollLeft)
-            component.presenter.setScrollLeft(updatedScrollLeft)
+            event.preventDefault() if target.canScrollLeftTo(updatedScrollLeft)
+            target.setScrollLeftColumn(updatedScrollLeft)
             return
          else
-            component.presenter.setMouseWheelScreenRow(component.screenRowForNode(target))
-            previousScrollTop = component.presenter.getScrollTop()
+            # target.setMouseWheelScreenRow(target.screenRowForNode(target))
+            previousScrollTop = target.component.getScrollTopRow()
             updatedScrollTop = previousScrollTop - delta
-            event.preventDefault() if component.presenter.canScrollTopTo(updatedScrollTop)
-            component.presenter.setScrollTop(updatedScrollTop)
+            # event.preventDefault() if target.component.canScrollTopTo(updatedScrollTop)
+            console.log('set scroll top ', updatedScrollTop)
+            target.component.setScrollTopRow(updatedScrollTop)
             return
 
       else if event[@horizontalModifier]
