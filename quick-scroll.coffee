@@ -89,41 +89,42 @@ module.exports = QuickScroll =
          target = isEditor
       else
          return
-         event.preventDefault()
-         if event[@horizontalModifier]
-            while !@canScrollLeft(target)
-               target = target.parentNode
-               return if !target
-         else
-            while !@canScrollTop(target)
-               target = target.parentNode
-               return if !target
-         return unless target.getBoundingClientRect
+         # event.preventDefault()
+         # if event[@horizontalModifier]
+         #    while !@canScrollLeft(target)
+         #       target = target.parentNode
+         #       return if !target
+         # else
+         #    while !@canScrollTop(target)
+         #       target = target.parentNode
+         #       return if !target
+         # return unless target.getBoundingClientRect
 
-      scrollSensitivity = @regularSensitivity
-
-      if @regionSide != "none"
-
-         {clientX} = event
-         {left, right, width} = target.getBoundingClientRect()
-
-
-         if @regionSide == "left"
-            regionStart = left
-            regionEnd = left + width*@regionSize/100
-
-         else if @regionSide == "right"
-            regionStart = right - width*@regionSize/100
-            regionEnd = right
-
-         if regionStart <= clientX <= regionEnd
-            scrollSensitivity = @regionSensitivity
+      # if @regionSide != "none"
+      #
+      #    {clientX} = event
+      #    {left, right, width} = target.getBoundingClientRect()
+      #
+      #
+      #    if @regionSide == "left"
+      #       regionStart = left
+      #       regionEnd = left + width*@regionSize/100
+      #
+      #    else if @regionSide == "right"
+      #       regionStart = right - width*@regionSize/100
+      #       regionEnd = right
+      #
+      #    if regionStart <= clientX <= regionEnd
+      #       scrollSensitivity = @regionSensitivity
 
       if event[@modifierA] || event[@modifierB]
+         scrollSensitivity = @regularSensitivity
          if event[@modifierA] && event[@modifierB]
             scrollSensitivity += @overloadedSensitivity
          else
             scrollSensitivity += @quickSensitivity
+      else
+         return
 
       delta = Math.round(wheelDelta * scrollSensitivity / 100)
 
