@@ -82,10 +82,13 @@ module.exports = QuickScroll =
       {wheelDelta, target} = event
 
       isEditor = target.closest('atom-text-editor')
+      # console.log(target)
+      console.log(isEditor)
 
-      if isEditor
-        target = isEditor
+      if isEditor?
+         target = isEditor
       else
+         return
          event.preventDefault()
          if event[@horizontalModifier]
             while !@canScrollLeft(target)
